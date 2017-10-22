@@ -1,4 +1,28 @@
+--[[
+first you need to set up the server 
+#1. you need the server files  
+ [https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/]
+  get the one at the bottom of the list
+#2. you need server config and resources
+  []
+  
+to "play" with the scripts you need a few "extra" things 
+ #1. you need the rcon tool
+
+
+--]]
+
 ClearPrints()
+
+
+
+
+-----------------------------------------------------------
+--**************************************************------
+--*************this is the button states*************---
+--***************can only be set  to 0, 1, 2 *******------
+----------------------------------------------------------
+
 --setup button
  button1state  = 2
 --resupply button
@@ -25,7 +49,14 @@ ClearPrints()
  button12state = 2
  button13state = 2
  button14state = 2
+----------------------------------------------------------
+--=======================================================
 
+-----------------------------------------------------------
+--**************************************************------
+--*************this is the bunker stats *************---
+--***you will want to play with different numbers***------
+----------------------------------------------------------
 status = 1
 stock = 0
 research = 0
@@ -38,7 +69,12 @@ sellLos = 0
 units = 0
 researchOf = 0
 researchresearch = 420
----------------------------------
+----------------------------------------------------------
+--========================================================
+
+----------------------------------------------------------
+--***some functions you dont need to worry about these***--
+-----------------------------------------------------------
 function Notify(text)
     SetNotificationTextEntry('STRING')
     AddTextComponentString(text)
@@ -66,12 +102,14 @@ function DisplayHelpText(str)
 	DisplayHelpTextFromStringLabel(0, 1, 1, 1000)
 	
 end
+-------------------------------------------------------------------
+--=================================================================
 
 -------------------------------------------------------------------
 ----------------------**scaleform testing**------------------------
 -------------------------------------------------------------------
 
-
+ii = 0
 function hideMiniMapStuff()
 	HideHelpTextThisFrame()
 	HideHudAndRadarThisFrame()
@@ -86,14 +124,15 @@ end
     local disable2 = true
 	
 function setDisruptionStats()
+          PushScaleformMovieFunctionParameterBool(true) 
 	 	  PushScaleformMovieFunction(scaleform, "SET_STATS")
 ------------------UNKNOWN-------------------		  
-		  PushScaleformMovieFunctionParameterFloat(1.0)
 ----------------logged in as-------------		  
 		  Citizen.InvokeNative(0xE234F0FBDDB9340A, GetPlayerName(PlayerId()))
-		  --PushScaleformMovieFunctionParameterString(GetPlayerName(PlayerId()))
+		  PushScaleformMovieFunctionParameterInt(PlayerId())
 ----------------picture of bunker-----------		  
-		  Citizen.InvokeNative(0xE234F0FBDDB9340A, "BKR_TF_R5")
+		  Citizen.InvokeNative(0xE234F0FBDDB9340A, "UA_BUNKER_TXD_"..ii)
+		   ii = ii + 1
 -------------text under bunker pic----------		  
 		  Citizen.InvokeNative(0xE234F0FBDDB9340A, "just some text")		 		  
 -------set location text------		  
@@ -124,10 +163,11 @@ function setDisruptionStats()
 ------set number of total research projects-------
 		 PushScaleformMovieFunctionParameterInt(researchresearch)
 -------UNKNOWN------
-		 PushScaleformMovieFunctionParameterInt(staff)
-		 
-		       		  
+		 PushScaleformMovieFunctionParameterInt(staff)		       		  
 	       PopScaleformMovieFunctionVoid()
+		  if ii >=12 then
+		   ii = 0
+		  end
 end	
 function enableControlActions()
 
@@ -268,7 +308,7 @@ function enableMouse()
  PushScaleformMovieFunctionParameterInt(button14state)
  PopScaleformMovieFunctionVoid() 
  end 
- setDisruptionStats()
+ --setDisruptionStats()
  --IsControlJustPressed(2, 242)         
   if IsControlJustPressed(2, 242) and bvar >0 then
    bvar = 0.0
@@ -299,6 +339,7 @@ function logInButton()
  if HasNamedScaleformMovieLoaded("DISRUPTION_LOGISTICS") then
   
   if IsControlJustPressed(2, 237) and vVar == nil then
+    setDisruptionStats()
        PushScaleformMovieFunction(scaleform, "GET_CURRENT_ROLLOVER")
 	 inputeventSelect = PopScaleformMovieFunction()
   selectionBool = Citizen.InvokeNative(0x768FF8961BA904D6, getCurrentSelection)
@@ -318,7 +359,8 @@ function logInButton()
    getCurrentSelection = PopScaleformMovieFunction()
    PushScaleformMovieFunction(scaleform, "GET_CURRENT_SCREEN_ID")
    getCurrentScreenID = PopScaleformMovieFunction() 
-   CallScaleformMovieFunctionFloatParams(scaleform, "SET_INPUT_EVENT", 201.0, -1, -1, -1, -1)   
+   CallScaleformMovieFunctionFloatParams(scaleform, "SET_INPUT_EVENT", 201.0, -1, -1, -1, -1)
+      CallScaleformMovieFunctionFloatParams(scaleform, "SET_INPUT_EVENT", 201.0, -1, -1, -1, -1)
       
    else
     vVar = nil
@@ -351,8 +393,9 @@ function randomDisruptionLogisticsStats()
   researchOf = GetRandomIntInRange(0, 420)
 end
 researchStatsSet = false
-function setDisruptionResearchStats()
+function setDisruptionResearchStats()		  
 		 researchStatsSet = true
+
          PushScaleformMovieFunction(scaleform, "SET_RESEARCH")
 		 PushScaleformMovieFunctionParameterInt(1000)
 		 PushScaleformMovieFunctionParameterInt(25)
@@ -550,13 +593,19 @@ Citizen.CreateThread(function()
 
 
  while true do
+ 
+
+
+
+
+
   if selectionBool and ScreenIDBool then 
 
    if vVar == 2 and nVar == 2 then
      PushScaleformMovieFunction(scaleform, "SHOW_SCREEN")
 	 PushScaleformMovieFunctionParameterInt(1)
 	 PopScaleformMovieFunctionVoid()
-	 setDisruptionStats()	 
+	 --setDisruptionStats()	 
 	 page = 1
    end
    if vVar == 3 then
@@ -630,6 +679,10 @@ Citizen.CreateThread(function()
   end
 	Citizen.Wait(0)	
 
+
+
+
+	
      playerPed = GetPlayerPed(PlayerId())
      playerCoords = GetEntityCoords(GetPlayerPed(PlayerId()), true) 
      if GetDistanceBetweenCoords(playerCoords, 908.404, -3207.314, -97.187) < 2.8 then
@@ -638,9 +691,10 @@ Citizen.CreateThread(function()
       DisplayHelpText("Use ~INPUT_PICKUP~ to ~y~open business")
 	 end
 	 if GetDistanceBetweenCoords(playerCoords, 908.404, -3207.314, -97.187) < 2.8 and IsControlJustPressed(1, 38) then	 
+	  
 	  disable = not disable
       randomDisruptionLogisticsStats()
-	  --setDisruptionResearchStats()
+	  --setDisruptionResearchStats()	  
      elseif GetDistanceBetweenCoords(playerCoords, 908.404, -3207.314, -97.187) > 2.8 then
 	  disable = true
 	 end
@@ -652,14 +706,16 @@ Citizen.CreateThread(function()
 	  
 	 end	 
      if disable == true then
+	  disruptScreen = true
       SetScaleformMovieAsNoLongerNeeded(scaleform)
       page = 0
 	  researchStatsSet = false
 	   --setDisruptionResearchStats()
      end	
     if disable == false then
-     things("DISRUPTION_LOGISTICS")
-      DrawScaleformMovieFullscreen(scaleform, 255, 25, 100, 255, 0)	 
+	 disruptScreen = false
+      things("DISRUPTION_LOGISTICS")
+       DrawScaleformMovieFullscreen(scaleform, 255, 25, 100, 255, 0)	 
 	   
 		if page == 0 and vVar == 1 then
           		
@@ -669,23 +725,23 @@ Citizen.CreateThread(function()
 		end
 		if page == 2 then		 
          --setDisruptionResearchStats()
-		 setDisruptionStats()
+		 --setDisruptionStats()
 		end	
 		if page == 3 then		 
          --setDisruptionResearchStats()
-		 setDisruptionStats()
+		 --setDisruptionStats()
 		end	
 		if page == 7 then		 
         -- setDisruptionResearchStats()
-		 setDisruptionStats()
+		 --setDisruptionStats()
 		end	
 		if page == 4 then		 
          --setDisruptionResearchStats()
-		 setDisruptionStats()
+		 --setDisruptionStats()
 		end	
 		if page == 5 then		 
          -- setDisruptionResearchStats()
-          setDisruptionStats()	 
+          --setDisruptionStats()	 
 		end			
 	
 	  logInButton()      	  			 	
@@ -698,3 +754,39 @@ end
 --setDisruptionResearchStats()
 end)
 --setDisruptionResearchStats()
+disruptScreen = false
+Citizen.CreateThread(function()
+ while true do
+  Citizen.Wait(0)
+	 playerPed = GetPlayerPed(PlayerId())
+     playerCoords = GetEntityCoords(playerPed, true)
+     
+	 if GetInteriorFromEntity(playerPed) == 258561 and disruptScreen == false then
+	  RequestStreamedTextureDict("Prop_Screen_GR_Disruption", 0)
+	   if HasStreamedTextureDictLoaded("Prop_Screen_GR_Disruption") then
+        if not IsNamedRendertargetRegistered("gr_bunker_laptop_01a") then
+	     RegisterNamedRendertarget("gr_bunker_laptop_01a", 0)
+        end 
+		if not Citizen.InvokeNative(0x4EC4357A34845D4A, -424277613) then
+		 LinkNamedRendertarget(-424277613)
+		 disruptScreen = true
+		end
+	   end
+	end
+	
+    if GetInteriorFromEntity(playerPed) == 258561 and disruptScreen == true then
+     bunkerLaptopRenderTargetId = GetNamedRendertargetRenderId("gr_bunker_laptop_01a")
+	 SetTextRenderId(bunkerLaptopRenderTargetId)
+	 SetScreenDrawPosition(73, 73)
+     Citizen.InvokeNative(0x61BB1D9B3A95D802, 4)
+     Citizen.InvokeNative(0xC6372ECD45D73BCD, 1)
+     DrawSprite("Prop_Screen_GR_Disruption", "Prop_Screen_GR_Disruption", 0.5, 0.5, 1.0, 1.0, 0.0, 255, 255, 255, 255)
+	 ScreenDrawPositionEnd()
+	 SetTextRenderId(GetDefaultScriptRendertargetRenderId())
+    end
+    --if disruptScreen == false then
+     --SetTextRenderId(GetDefaultScriptRendertargetRenderId())
+    --end	
+ 
+ end
+end)
