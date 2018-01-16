@@ -1,16 +1,4 @@
---[[
-first you need to set up the server 
-#1. you need the server files  
- [https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/]
-  get the one at the bottom of the list
-#2. you need server config and resources
-  []
-  
-to "play" with the scripts you need a few "extra" things 
- #1. you need the rcon tool
 
-
---]]
 
 ClearPrints()
 
